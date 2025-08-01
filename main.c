@@ -1,0 +1,88 @@
+/*
+ * File Name: main.c
+ * Author: Haylee Jackson
+ * Purpose: the main function for the maze game
+ * Last Modified: 09/10/2021
+ * 
+*/ 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "game.h"
+#include "map.h"
+#include "fileIO.h"
+#include "linkedList.h"
+
+int main( int argc, char *argv[] )
+{ 
+    /* variable declarations */
+    MapObject player = {'^', 0, 0};
+    MapObject enemy = {'~', 0, 0};
+    MapObject goal = {'x', 0, 0};
+    char ** map = NULL;
+    int  mapRow = 0, mapCol = 0;
+    char command;
+    CommandPtr pFunction;
+    LinkedList * undoList = NULL; 
+
+    if ( argc == 2 )
+    { 
+        undoList = createLinkedList(); 
+        map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+
+        if (map != NULL)
+        {
+            /* map has been initialized */
+            do
+            { 
+                printMap( map, mapRow, mapCol );
+
+                disableBuffer();
+                scanf( " %c", &command );
+                
+                if ( command == 'u' )
+                {
+                    undo( undoList, &map, &player, &enemy, mapRow );
+                }
+                else
+                {
+                    pFunction = controlFunc( command );
+                    if ( pFunction != NULL )
+                    {
+                        save( undoList, map, mapRow, mapCol, player, enemy ); 
+                        (*pFunction)( map, &player, &enemy ); /* moves player */
+                    }
+                }
+            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) ); /*game is not won and not lost */
+
+            enableBuffer();
+
+            if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
+            {
+                /* game is won */
+                printMap( map, mapRow, mapCol );
+                printf( "You Win!\n" );
+            }
+            else
+            {
+                /* game is lost */
+                printMap( map, mapRow, mapCol );
+                printf( "You Lost!\n" );
+            }
+            
+            /* free malloced memory */
+            freeSavedMap( undoList, mapRow );
+        }
+        
+        /* free malloced memory */
+        freeLinkedList( undoList, &free );
+        free( undoList );
+        freeMap( map, mapRow );
+    }
+    else
+    { 
+        /* Error when number of command line arguments is not equal to 2 */
+        printf( "Error: Not the right number of arguements in the command line." );
+    }
+    return 0;
+}
