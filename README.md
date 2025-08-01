@@ -24,6 +24,7 @@ Run the following command.
 ```
 maze path/to/map.txt
 ```
+See [Map File](README.md#Map-File) for more information on `map.txt`.
 
 ## Commands in Game
 
@@ -47,7 +48,15 @@ The following table outlines the symbols that can be found on the map of the maz
 
 `map.txt` is the file containing the the set up of the maze.
 
-The first line contains three numbers, the amount of objects, the number of rows and number of columns in the map.
+You can either use the existing map that comes with the game or create your own.
+
+## Use Existing Maps
+
+## Create Your Own Map
+
+The map file should have the following layout as specified below.
+
+The first line of the file contains three numbers, the amount of objects, the number of rows and number of columns in the map.
 
 The rest of the file lists the objects and their location in the format: `row_number column_number object_code`
 
