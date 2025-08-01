@@ -52,6 +52,12 @@ You can either use the existing map that comes with the game or create your own.
 
 ## Use Existing Maps
 
+If you want to use the existing map, run the following command.
+
+```
+maze map.txt
+```
+
 ## Create Your Own Map
 
 The map file should have the following layout as specified below.
