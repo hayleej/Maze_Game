@@ -34,6 +34,21 @@ void enemyUpDown( char ** map, MapObject * enemy, MapObject * player )
             enemy->row = enemy->row + 1;
             map[enemy->row][enemy->col] = '~';
         }
+        else if ( map[enemy->row + 1][enemy->col] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->col == player->col)
+            {
+                /* enemy is in same col as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move down towards player so move left/right towards player */
+                enemyLeftRight( map, enemy, player );
+            }
+            
+        }
 
     }
     else if (distance < 0)
@@ -47,6 +62,21 @@ void enemyUpDown( char ** map, MapObject * enemy, MapObject * player )
             map[enemy->row][enemy->col] = ' ';
             enemy->row = enemy->row - 1;
             map[enemy->row][enemy->col] = '~';
+        }
+        else if ( map[enemy->row - 1][enemy->col] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->col == player->col)
+            {
+                /* enemy is in same col as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move up towards player so move left/right towards player */
+                enemyLeftRight( map, enemy, player );
+            }
+            
         }
     }
     else
@@ -87,6 +117,22 @@ void enemyLeftRight( char ** map, MapObject * enemy, MapObject * player )
             enemy->col = enemy->col + 1;
             map[enemy->row][enemy->col] = '~';
         }
+        else if ( map[enemy->row][enemy->col + 1] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->row == player->row)
+            {
+                /* enemy is in same row as player */
+
+            }
+            else
+            {
+                /* enemy cannot move right towards player so move down/up towards player */
+                enemyUpDown( map, enemy, player );
+            }
+            
+        }
+        
 
     }
     else if (distance < 0)
@@ -100,6 +146,21 @@ void enemyLeftRight( char ** map, MapObject * enemy, MapObject * player )
             map[enemy->row][enemy->col] = ' ';
             enemy->col = enemy->col - 1;
             map[enemy->row][enemy->col] = '~';
+        }
+        else if ( map[enemy->row][enemy->col - 1] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->row == player->row)
+            {
+                /* enemy is in same row as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move left towards player so move down/up towards player */
+                enemyUpDown( map, enemy, player );
+            }
+            
         }
     }
     else
