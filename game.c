@@ -93,8 +93,7 @@ void up( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '^';
         player->obj = '^';
     }
-
-    enemyUpDown( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -120,8 +119,7 @@ void down( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = 'v';
         player->obj = 'v';
     }
-
-    enemyUpDown( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -147,8 +145,7 @@ void left( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '<';
         player->obj = '<';
     }
-
-    enemyLeftRight( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -175,8 +172,7 @@ void right( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '>';
         player->obj = '>';
     }
-
-    enemyLeftRight( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 

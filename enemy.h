@@ -10,8 +10,9 @@
 
 #include "map.h"
 #include "game.h"
+#include "searchAlgorithm.h"
 
-
+void moveEnemy( char ** map, MapObject * enemy, MapObject * player );
 void enemyUpDown( char ** map, MapObject * enemy, MapObject * player );
 void enemyLeftRight( char ** map, MapObject * enemy, MapObject * player );
 

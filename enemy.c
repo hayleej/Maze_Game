@@ -6,7 +6,43 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "enemy.h"
+
+/**
+ * @brief  moves the enemy toward player using A* Algorithm to find shortest path
+ * @param  map: map of maze
+ * @param  enemy: symbol and location of enemy in map
+ * @param  player: symbol and location of player in map
+ * @retval None
+ */
+void moveEnemy( char ** map, MapObject * enemy, MapObject * player )
+{
+    Point* path = NULL;
+    
+    /* Start point*/
+    Point start = {0, 0};
+    Point goal = {0, 0};
+    start.col = enemy->col;
+    start.row = enemy->row;
+    
+    /* Goal point*/
+    goal.col = player->col;
+    goal.row = player->row;
+    
+    /* Run A* algorithm  to find shortest path from enemy to player*/
+    path = aStar(map, start, goal);
+
+    if (path) 
+    {
+        /* move the enemy one along the path */
+        map[enemy->row][enemy->col] = ' ';
+        enemy->row = path[1].row;
+        enemy->col = path[1].col;
+        map[enemy->row][enemy->col] = '~';
+        free(path);
+    }
+}
 
 
 /**
