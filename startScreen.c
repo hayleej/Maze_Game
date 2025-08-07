@@ -10,12 +10,32 @@
 #include <string.h>
 #include "startScreen.h"
 
+void printTitle( int length )
+{
 
-void printStartScreen( char * errorLevelMessage )
-{ 
-    int length = 40;
-    /* variable declarations */
-    int i, j; 
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+
+    /* print top border */
+    printBorder(length);
+    
+    printLine("Maze Game!", length);
+    
+    /* print bottom border */
+    printBorder(length);
+    /*printLine(" ", length);*/
+}
+
+void printStartScreen( char * errorLevelMessage, int length )
+{
+
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+
     system( "clear" );
 
     /* print top border */
@@ -37,12 +57,21 @@ void printStartScreen( char * errorLevelMessage )
 
 void printLine( char * line, int length)
 {
+    if (length < MIN_LENGTH)
+    {
+        /* length should be min length or greater 
+         * this is mainly for when length is the number of columns in the map
+        */
+
+        length = MIN_LENGTH;
+    }
+    
     char finalLine[length];
     int lineLength = strlen(line);
     int blank_each_side = (length - lineLength) / 2;
     
     int i; 
-    finalLine[0] = '|';
+    finalLine[0] = '*';
     for ( i = 1; i < blank_each_side; i++ )
     { 
         finalLine[i] =  ' ';
@@ -56,7 +85,7 @@ void printLine( char * line, int length)
     { 
         finalLine[i] =  ' ';
     }
-    finalLine[length - 1] = '|';
+    finalLine[length - 1] = '*';
     
     printf("%s\n",finalLine);
 }
@@ -64,10 +93,16 @@ void printLine( char * line, int length)
 void printBorder( int length)
 {
     int i;
-    printf("#"); /* corner of border */
-    for ( i = 0; i < length - 2; i++ )
-    { 
-        printf( "=" );
+
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
     }
-    printf("#\n");
+
+    printf("* "); /* corner of border */
+    for ( i = 0; i < length - 4; i+=2 )
+    { 
+        printf( "* " );
+    }
+    printf("*\n");
 }

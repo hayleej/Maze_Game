@@ -39,7 +39,7 @@ int main( int argc, char *argv[] )
         do
         { 
             /* display start screen */
-            printStartScreen(errorLevelMessage);
+            printStartScreen(errorLevelMessage, MIN_LENGTH);
             disableBuffer();
             /* select difficulty level*/
             scanf( " %c", &level );

@@ -15,7 +15,7 @@
  * @note   From UCP Assignment 1 (was given as part of assignment 1)
  * @retval None
  */
-void disableBuffer()
+void disableBuffer(void)
 {
     struct termios mode;
 
@@ -34,7 +34,7 @@ void disableBuffer()
  * @note   From UCP Assignment 1 (was given as part of assignment 1)
  * @retval None
  */
-void enableBuffer()
+void enableBuffer(void)
 {
     struct termios mode;
 

@@ -13,6 +13,7 @@
 #include "map.h"
 #include "linkedList.h"
 #include "enemy.h"
+#include "startScreen.h"
 
 
 #define FALSE 0
