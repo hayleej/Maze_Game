@@ -11,7 +11,7 @@
 
 #include "terminal.h"
 
-#define MIN_LENGTH 41
+#define MIN_LENGTH 51
 
 void printBorder( int length);
 void printStartScreen( char * errorLevelMessage, int length );

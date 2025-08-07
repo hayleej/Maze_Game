@@ -45,11 +45,11 @@ int main( int argc, char *argv[] )
             scanf( " %c", &level );
             strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
             errorLevelMessage[7] = level;
-        } while ( !((level == '1') || (level == '2' )) ); /* correct option has not been selected */
+        } while ( !((level == '1') || (level == '2' ) || (level == '0' )) ); /* correct option has not been selected */
 
         enableBuffer();
 
-        if (map != NULL)
+        if ((map != NULL) && (level != '0')) /* user hasn't exited game */
         {
             /* map has been initialized */
             do
@@ -63,7 +63,7 @@ int main( int argc, char *argv[] )
                 {
                     undo( undoList, &map, &player, &enemy, mapRow );
                 }
-                else
+                else if (command != '0')
                 {
                     pFunction = controlFunc( command );
                     if ( pFunction != NULL )
@@ -72,11 +72,16 @@ int main( int argc, char *argv[] )
                         (*pFunction)( map, &player, &enemy ); /* moves player */
                     }
                 }
-            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) ); /*game is not won and not lost */
+            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) && (command != '0')); /*game is not won and not lost */
 
             enableBuffer();
-
-            if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
+            
+            if (command == '0')
+            {
+                /* exiting game */
+                printf( "Exiting game...\n" );
+            }
+            else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
             {
                 /* game is won */
                 printMap( map, mapRow, mapCol );

@@ -47,9 +47,14 @@ void printStartScreen( char * errorLevelMessage, int length )
     /* print bottom border */
     printBorder(length);
 
+    printLine("Select 0 at any time to exit the game", length);
+
+    printBorder(length);
+    
     printLine("Select your difficulty level:", length);
     printLine("(1) easy", length);
     printLine("(2) hard", length);
+    
 
     printBorder(length);
     printf("%s\n", errorLevelMessage);
