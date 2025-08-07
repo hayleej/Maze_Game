@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -pedantic -ansi -g
-OBJ = main.o map.o game.o terminal.o fileIO.o linkedList.o searchAlgorithm.o enemy.o
+OBJ = main.o map.o game.o terminal.o fileIO.o linkedList.o searchAlgorithm.o enemy.o startScreen.o
 EXEC = maze
 
 
@@ -30,6 +30,9 @@ searchAlgorithm.o : searchAlgorithm.c searchAlgorithm.h
 
 enemy.o : enemy.c enemy.h searchAlgorithm.h
 			$(CC) -c enemy.c $(CFLAGS)
+
+startScreen.o : startScreen.c startScreen.h terminal.h
+			$(CC) -c startScreen.c $(CFLAGS)
 
 clean :
 			rm -f $(EXEC) $(OBJ)

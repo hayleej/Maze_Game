@@ -8,10 +8,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "game.h"
 #include "map.h"
 #include "fileIO.h"
 #include "linkedList.h"
+#include "startScreen.h"
 
 int main( int argc, char *argv[] )
 { 
@@ -22,13 +24,30 @@ int main( int argc, char *argv[] )
     char ** map = NULL;
     int  mapRow = 0, mapCol = 0;
     char command;
+    char level; 
     CommandPtr pFunction;
     LinkedList * undoList = NULL; 
+    char errorLevelMessage[52];
+    
 
     if ( argc == 2 )
     { 
         undoList = createLinkedList(); 
         map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+
+        
+        do
+        { 
+            /* display start screen */
+            printStartScreen(errorLevelMessage);
+            disableBuffer();
+            /* select difficulty level*/
+            scanf( " %c", &level );
+            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
+            errorLevelMessage[7] = level;
+        } while ( !((level == '1') || (level == '2' )) ); /* correct option has not been selected */
+
+        enableBuffer();
 
         if (map != NULL)
         {
