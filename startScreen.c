@@ -71,7 +71,7 @@ void printLine( char * line, int length)
         length = MIN_LENGTH;
     }
     
-    char finalLine[length];
+    char* finalLine = (char *) malloc( sizeof(char) * length ) ;
     int lineLength = strlen(line);
     int blank_each_side = (length - lineLength) / 2;
     
@@ -93,6 +93,7 @@ void printLine( char * line, int length)
     finalLine[length - 1] = '*';
     
     printf("%s\n",finalLine);
+    free(finalLine);
 }
 
 void printBorder( int length)

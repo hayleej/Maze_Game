@@ -23,7 +23,7 @@ void printMap( char ** map, int mapRow, int mapCol )
 { 
     /* variable declarations */
     int i, j;
-    char line[mapCol];
+    char* line = (char *) malloc( sizeof(char) * mapCol ) ;
 
     system( "clear" );
     printTitle(mapCol+2);
@@ -38,6 +38,7 @@ void printMap( char ** map, int mapRow, int mapCol )
         printLine( line, mapCol + 2); /* mapCol + 2 so that there is space on either side of the map*/   
     }
     printBorder(mapCol+2);
+    free(line);
 }
 
 
