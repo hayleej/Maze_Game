@@ -22,7 +22,7 @@ int main( int argc, char *argv[] )
     MapObject enemy = {'~', 0, 0};
     MapObject goal = {'x', 0, 0};
     char ** map = NULL;
-    int  mapRow = 0, mapCol = 0;
+    int  mapRow = 0, mapCol = 0, metadataAmount = 0;
     char command;
     char option;
     char map_path [100];
@@ -50,19 +50,19 @@ int main( int argc, char *argv[] )
 
         if (option == '2')
         {
+            /* enter custom map path */
             system( "clear" );
             printTitle(MIN_LENGTH);
             do
             {
-                /* enter custom map path */
                 printf("Enter path to custom map:\n");
                 /* select path to custom map */
-                fgets(map_path, sizeof(map_path), stdin); // Read input as a string
-                map_path[strcspn(map_path, "\n")] = 0; // Remove the newline character if present
+                fgets(map_path, sizeof(map_path), stdin);
+                map_path[strcspn(map_path, "\n")] = 0; /* Remove the newline character if present */
                 if (strcmp(map_path,"0") != 0)
                 {
                     /* so to not print error opening file when trying to exit */
-                    map = readFile( map_path, &mapRow, &mapCol, &player, &enemy, &goal );
+                    map = readFile( map_path, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
                 }
                 
             } while ((map == NULL) && (strcmp(map_path,"0") != 0)); /* until map_path is correct or 0 is used to exit */
@@ -71,7 +71,7 @@ int main( int argc, char *argv[] )
         }
         else
         {   
-            map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+            map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
         }
         
 

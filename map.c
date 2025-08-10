@@ -124,6 +124,43 @@ char** initializeMap( int mapRow, int mapCol )
 
 
 
+/**
+ * @brief  gets objectCode based on position in map
+ * @param  object: the char from map[row][col]
+ * @retval the code of the object as defined in `map.h`
+ */
+int whichObjectCode(char object)
+{
+    int objectCode = -1; /* -1 for error */
+
+
+    if ( object == 'x' )
+    {
+        /* goal */
+        objectCode = GOAL;
+    }
+    else if ( object == '~' )
+    {
+        /* enemy */
+        objectCode = ENEMY;
+    }
+    else if ( object == 'o' )
+    {
+        /* enemy */
+        objectCode = WALL;
+    }
+    else if ( (object == '^') || (object == '<') || (object == '>') || (object == 'v') )
+    {
+        /* player */
+        objectCode = PLAYER;
+    }
+    else
+    {
+        /* border or empty space */
+    }
+
+    return objectCode;
+}
 
 
 

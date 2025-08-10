@@ -22,6 +22,7 @@ typedef struct MapObject {
 void insertObject( char *** mapPtr, int row, int col, MapObject * object );
 void whichObject( int objectCode, char *** mapPtr, int row, int col, MapObject * player, MapObject * enemy, MapObject * goal );
 char** initializeMap( int mapRow, int mapCol );
+int whichObjectCode(char object);
 void freeMap( char ** map, int mapRow );
 
 
