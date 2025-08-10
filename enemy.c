@@ -6,7 +6,43 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "enemy.h"
+
+/**
+ * @brief  moves the enemy toward player using A* Algorithm to find shortest path
+ * @param  map: map of maze
+ * @param  enemy: symbol and location of enemy in map
+ * @param  player: symbol and location of player in map
+ * @retval None
+ */
+void moveEnemy( char ** map, MapObject * enemy, MapObject * player )
+{
+    Point* path = NULL;
+    
+    /* Start point*/
+    Point start = {0, 0};
+    Point goal = {0, 0};
+    start.col = enemy->col;
+    start.row = enemy->row;
+    
+    /* Goal point*/
+    goal.col = player->col;
+    goal.row = player->row;
+    
+    /* Run A* algorithm  to find shortest path from enemy to player*/
+    path = aStar(map, start, goal);
+
+    if (path) 
+    {
+        /* move the enemy one along the path */
+        map[enemy->row][enemy->col] = ' ';
+        enemy->row = path[1].row;
+        enemy->col = path[1].col;
+        map[enemy->row][enemy->col] = '~';
+        free(path);
+    }
+}
 
 
 /**
@@ -34,6 +70,21 @@ void enemyUpDown( char ** map, MapObject * enemy, MapObject * player )
             enemy->row = enemy->row + 1;
             map[enemy->row][enemy->col] = '~';
         }
+        else if ( map[enemy->row + 1][enemy->col] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->col == player->col)
+            {
+                /* enemy is in same col as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move down towards player so move left/right towards player */
+                enemyLeftRight( map, enemy, player );
+            }
+            
+        }
 
     }
     else if (distance < 0)
@@ -47,6 +98,21 @@ void enemyUpDown( char ** map, MapObject * enemy, MapObject * player )
             map[enemy->row][enemy->col] = ' ';
             enemy->row = enemy->row - 1;
             map[enemy->row][enemy->col] = '~';
+        }
+        else if ( map[enemy->row - 1][enemy->col] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->col == player->col)
+            {
+                /* enemy is in same col as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move up towards player so move left/right towards player */
+                enemyLeftRight( map, enemy, player );
+            }
+            
         }
     }
     else
@@ -87,6 +153,22 @@ void enemyLeftRight( char ** map, MapObject * enemy, MapObject * player )
             enemy->col = enemy->col + 1;
             map[enemy->row][enemy->col] = '~';
         }
+        else if ( map[enemy->row][enemy->col + 1] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->row == player->row)
+            {
+                /* enemy is in same row as player */
+
+            }
+            else
+            {
+                /* enemy cannot move right towards player so move down/up towards player */
+                enemyUpDown( map, enemy, player );
+            }
+            
+        }
+        
 
     }
     else if (distance < 0)
@@ -100,6 +182,21 @@ void enemyLeftRight( char ** map, MapObject * enemy, MapObject * player )
             map[enemy->row][enemy->col] = ' ';
             enemy->col = enemy->col - 1;
             map[enemy->row][enemy->col] = '~';
+        }
+        else if ( map[enemy->row][enemy->col - 1] == 'o' )
+        {
+            /* object blocking enemy move */
+            if (enemy->row == player->row)
+            {
+                /* enemy is in same row as player */
+                
+            }
+            else
+            {
+                /* enemy cannot move left towards player so move down/up towards player */
+                enemyUpDown( map, enemy, player );
+            }
+            
         }
     }
     else

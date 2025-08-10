@@ -8,10 +8,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "game.h"
 #include "map.h"
 #include "fileIO.h"
 #include "linkedList.h"
+#include "startScreen.h"
 
 int main( int argc, char *argv[] )
 { 
@@ -22,15 +24,58 @@ int main( int argc, char *argv[] )
     char ** map = NULL;
     int  mapRow = 0, mapCol = 0;
     char command;
+    char option;
+    char map_path [100];
     CommandPtr pFunction;
     LinkedList * undoList = NULL; 
+    char errorLevelMessage[52];
+    
 
     if ( argc == 2 )
     { 
         undoList = createLinkedList(); 
-        map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+        
+        do
+        { 
+            /* display start screen */
+            printStartScreen(errorLevelMessage, MIN_LENGTH);
+            disableBuffer();
+            /* select map option*/
+            scanf( " %c", &option );
+            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
+            errorLevelMessage[7] = option;
+        } while ( !((option == '1') || (option == '2' ) || (option == '0' )) ); /* correct option has not been selected */
 
-        if (map != NULL)
+        enableBuffer();
+
+        if (option == '2')
+        {
+            system( "clear" );
+            printTitle(MIN_LENGTH);
+            do
+            {
+                /* enter custom map path */
+                printf("Enter path to custom map:\n");
+                /* select path to custom map */
+                fgets(map_path, sizeof(map_path), stdin); // Read input as a string
+                map_path[strcspn(map_path, "\n")] = 0; // Remove the newline character if present
+                if (strcmp(map_path,"0") != 0)
+                {
+                    /* so to not print error opening file when trying to exit */
+                    map = readFile( map_path, &mapRow, &mapCol, &player, &enemy, &goal );
+                }
+                
+            } while ((map == NULL) && (strcmp(map_path,"0") != 0)); /* until map_path is correct or 0 is used to exit */
+            
+            
+        }
+        else
+        {   
+            map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+        }
+        
+
+        if ((map != NULL) && (option != '0')) /* user hasn't exited game */
         {
             /* map has been initialized */
             do
@@ -44,7 +89,7 @@ int main( int argc, char *argv[] )
                 {
                     undo( undoList, &map, &player, &enemy, mapRow );
                 }
-                else
+                else if (command != '0')
                 {
                     pFunction = controlFunc( command );
                     if ( pFunction != NULL )
@@ -53,11 +98,16 @@ int main( int argc, char *argv[] )
                         (*pFunction)( map, &player, &enemy ); /* moves player */
                     }
                 }
-            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) ); /*game is not won and not lost */
+            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) && (command != '0')); /*game is not won and not lost */
 
             enableBuffer();
-
-            if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
+            
+            if (command == '0')
+            {
+                /* exiting game */
+                printf( "Exiting game...\n" );
+            }
+            else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
             {
                 /* game is won */
                 printMap( map, mapRow, mapCol );

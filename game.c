@@ -22,19 +22,23 @@
 void printMap( char ** map, int mapRow, int mapCol )
 { 
     /* variable declarations */
-    int i, j; 
+    int i, j;
+    char* line = (char *) malloc( sizeof(char) * mapCol ) ;
 
     system( "clear" );
-
+    printTitle(mapCol+2);
     /* print map with for loop */
     for ( i = 0; i < mapRow; i++ )
     { 
         for ( j = 0; j < mapCol; j++ )
         { 
-            printf( "%c", map[i][j] );
+            line[j] = map[i][j];
         }
-        printf( "\n" );   
+        
+        printLine( line, mapCol + 2); /* mapCol + 2 so that there is space on either side of the map*/   
     }
+    printBorder(mapCol+2);
+    free(line);
 }
 
 
@@ -93,8 +97,7 @@ void up( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '^';
         player->obj = '^';
     }
-
-    enemyUpDown( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -120,8 +123,7 @@ void down( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = 'v';
         player->obj = 'v';
     }
-
-    enemyUpDown( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -147,8 +149,7 @@ void left( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '<';
         player->obj = '<';
     }
-
-    enemyLeftRight( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 
@@ -175,8 +176,7 @@ void right( char ** map, MapObject * player, MapObject * enemy )
         map[player->row][player->col] = '>';
         player->obj = '>';
     }
-
-    enemyLeftRight( map, enemy, player );
+    moveEnemy(map, enemy, player);
 }
 
 

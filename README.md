@@ -1,38 +1,45 @@
 # Maze_Game
 A command line maze game. Get from one end of the maze to the other without the enemy catching you.
 
-# Installation
+## Installation
 
 1. Download the game using the command 
-```
+
+```bash
 $ git clone https://github.com/hayleej/Maze_Game/
 ```
 
 2. Move to the project directory
-```
+
+```bash
 $ cd Maze_Game/
 ```
 
 3. Run make command
-```
+
+```bash
 $ make
 ```
 
-# How to Play the Game
+## How to Play the Game
 
 Run the following command.
+
+```bash
+$ maze path/to/map.txt
 ```
-maze path/to/map.txt
-```
+
 See [Map File](README.md#Map-File) for more information on `map.txt`.
 
-## Commands in Game
+### Commands in Game
 
 Use `w`, `s`, `a`, `d` to move the player icon.
 
 `u` can be used to undo the previous move.
 
-## Symbols on Map
+`0` can be used at any time to exit the game.
+
+### Symbols on Map
 
 The following table outlines the symbols that can be found on the map of the maze and their meaning.
 
@@ -44,21 +51,21 @@ The following table outlines the symbols that can be found on the map of the maz
 | ~                      | Enemy. They are trying to catch player. |
 | #--#<br>\| &nbsp; &nbsp;  \|<br>#--# | Border of the maze.                     |
 
-# Map File
+## Map File
 
 `map.txt` is the file containing the the set up of the maze.
 
 You can either use the existing map that comes with the game or create your own.
 
-## Use Existing Maps
+### Use Existing Maps
 
 If you want to use the existing map, run the following command.
 
-```
-maze map.txt
+```bash
+$ maze map.txt
 ```
 
-## Create Your Own Map
+### Create Your Own Map
 
 The map file should have the following layout as specified below.
 
