@@ -10,6 +10,11 @@
 #include <string.h>
 #include "startScreen.h"
 
+/**
+ * @brief  prints the title Maze Game with border
+ * @param  length: the number of characters per line
+ * @retval None
+ */
 void printTitle( int length )
 {
 
@@ -20,15 +25,26 @@ void printTitle( int length )
 
     /* print top border */
     printBorder(length);
+
     printf("\033[1m");
     printLine("Maze Game!", length);
     printf("\033[0m");
-    
+
     /* print bottom border */
     printBorder(length);
-    /*printLine(" ", length);*/
+
+    printf("\033[3m");
+    printLine("Select 0 at any time to exit the game", length);
+    printf("\033[0m");
+    printBorder(length);
 }
 
+/**
+ * @brief  prints the start screen for maze game 
+ * @param  errorLevelMessage: error message for if user has inputted invalid option, otherwise blank
+ * @param  length: the number of characters per line
+ * @retval None
+ */
 void printStartScreen( char * errorLevelMessage, int length )
 {
 
@@ -45,22 +61,32 @@ void printStartScreen( char * errorLevelMessage, int length )
     printLine("Welcome to", length);
     printLine("Maze Game!", length);
     printf("\033[0m");
+
     /* print bottom border */
     printBorder(length);
+
+
     printf("\033[3m");
     printLine("Select 0 at any time to exit the game", length);
     printf("\033[0m");
     printBorder(length);
     
-    printLine("Select your difficulty level:", length);
-    printLine("(1) easy", length);
-    printLine("(2) hard", length);
+    /* map option */
+    printLine("Select game option:", length);
+    printLine("(1) normal    ", length);
+    printLine("(2) custom map", length);
     
 
     printBorder(length);
     printf("%s\n", errorLevelMessage);
 }
 
+/**
+ * @brief  prints a line with border for game
+ * @param  line: the line to print
+ * @param  length: the number of characters per line
+ * @retval None
+ */
 void printLine( char * line, int length)
 {
     if (length < MIN_LENGTH)
@@ -97,6 +123,11 @@ void printLine( char * line, int length)
     free(finalLine);
 }
 
+/**
+ * @brief  prints the top or bottom border of game
+ * @param  length: the number of characters per line
+ * @retval None
+ */
 void printBorder( int length)
 {
     int i;
