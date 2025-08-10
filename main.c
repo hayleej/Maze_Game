@@ -106,6 +106,26 @@ int main( int argc, char *argv[] )
             {
                 /* exiting game */
                 printf( "Exiting game...\n" );
+                
+                do
+                { 
+                    /* save progress prompt */
+                    printf( "Do you want to save your progress? [y/n]\n" );
+                    scanf( " %c", &option );
+                    if ((option != 'y') && (option != 'n' ))
+                    {
+                        /* print error */
+                        printf("ERROR: %c is an invalid option. Please select y or n",option);
+                    }
+                
+                } while ( !((option == 'y') || (option == 'n' ) )); /* correct option has not been selected */
+
+                if (option == 'y')
+                {
+                    /* save progress */
+                    writeSaveFile( "map.out", map, mapRow, mapCol, metadataAmount);
+                }
+                
             }
             else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
             {

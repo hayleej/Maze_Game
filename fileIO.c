@@ -48,7 +48,7 @@ char** readFile( char* filename, int * mapRow, int * mapCol, MapObject * player,
             map = initializeMap( *mapRow, *mapCol );
 
             /* read row, column, and object code from file */
-            for ( i = 0; i < metadataAmount; i++ )
+            for ( i = 0; i < *metadataAmount; i++ )
             {
                 nRead = fscanf( inFile, "%d %d %d", &row, &col, &objectCode );
 
@@ -87,11 +87,10 @@ void writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int met
 {
 
     FILE* outFile = fopen(filename, "w");
-    int nRead = 0;
     int row = 0, col = 0, objectCode = 0;
 
     /* write first line of file containing metadataAmount, mapRow and mapCol */
-    fprintf(outFile, "%d %d %d", metadataAmount, mapRow, mapCol);
+    fprintf(outFile, "%d %d %d\n", metadataAmount, mapRow, mapCol);
 
     
     /* read row, column, and object from map, and output to saved file */
@@ -101,10 +100,10 @@ void writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int met
         {
             objectCode = whichObjectCode(map[row][col]);
 
-            if ((0 <= objectCode) || (objectCode <= 3))
+            if ((0 <= objectCode) && (objectCode <= 3))
             {
                 /* objectCode is wall, player, goal, or enemy */
-                fprintf(outFile, "%d %d %d", row, col, objectCode);
+                fprintf(outFile, "%d %d %d\n", row, col, objectCode);
             }
             
         }

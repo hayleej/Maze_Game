@@ -11,6 +11,6 @@
 #include "map.h"
 
 char** readFile( char* filename, int * mapRow, int * mapCol, MapObject * player, MapObject * enemy, MapObject * goal, int * metadataAmount );
-char** writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int metadataAmount);
+void writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int metadataAmount);
 
 #endif
