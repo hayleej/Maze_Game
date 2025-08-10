@@ -15,6 +15,74 @@
 #include "linkedList.h"
 #include "startScreen.h"
 
+int playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal)
+{
+    LinkedList * undoList = NULL; 
+    char command;
+    CommandPtr pFunction;
+    /* map has been initialized */
+
+    undoList = createLinkedList(); 
+
+    do
+    { 
+        printMap( *map, mapRow, mapCol );
+
+        disableBuffer();
+        scanf( " %c", &command );
+        
+        if ( command == 'u' )
+        {
+            undo( undoList, map, player, enemy, mapRow );
+        }
+        else if (command != '0')
+        {
+            pFunction = controlFunc( command );
+            if ( pFunction != NULL )
+            {
+                save( undoList, *map, mapRow, mapCol, *player, *enemy ); 
+                (*pFunction)( *map, player, enemy ); /* moves player */
+            }
+        }
+    } while ( !( ( player->row == goal->row ) && ( player->col == goal->col ) ) && !( ( player->row == enemy->row ) && ( player->col == enemy->col ) ) && (command != '0')); /*game is not won and not lost */
+
+    enableBuffer();
+    
+    /* free malloced memory */
+    freeSavedMap( undoList, mapRow );
+    freeLinkedList( undoList, &free );
+    free( undoList );
+
+    return command;
+}
+
+
+void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount)
+{
+    char option;
+    /* exiting game */
+    printf( "Exiting game...\n" );
+    
+    do
+    { 
+        /* save progress prompt */
+        printf( "Do you want to save your progress? [y/n]\n" );
+        scanf( " %c", &option );
+        if ((option != 'y') && (option != 'n' ))
+        {
+            /* print error */
+            printf("ERROR: %c is an invalid option. Please select y or n",option);
+        }
+    
+    } while ( !((option == 'y') || (option == 'n' ) )); /* correct option has not been selected */
+
+    if (option == 'y')
+    {
+        /* save progress */
+        writeSaveFile( "map.out", map, mapRow, mapCol, metadataAmount);
+    }
+}
+
 int main( int argc, char *argv[] )
 { 
     /* variable declarations */
@@ -27,13 +95,12 @@ int main( int argc, char *argv[] )
     char option;
     char map_path [100];
     CommandPtr pFunction;
-    LinkedList * undoList = NULL; 
     char errorLevelMessage[52];
     
 
     if ( argc == 2 )
     { 
-        undoList = createLinkedList(); 
+        /*undoList = createLinkedList(); */
         
         do
         { 
@@ -76,60 +143,18 @@ int main( int argc, char *argv[] )
         }
         else
         {   
-            map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
+            map = readFile( "maps/level1.txt", &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
         }
         
 
         if ((map != NULL) && (option != '0')) /* user hasn't exited game */
         {
             /* map has been initialized */
-            do
-            { 
-                printMap( map, mapRow, mapCol );
-
-                disableBuffer();
-                scanf( " %c", &command );
-                
-                if ( command == 'u' )
-                {
-                    undo( undoList, &map, &player, &enemy, mapRow );
-                }
-                else if (command != '0')
-                {
-                    pFunction = controlFunc( command );
-                    if ( pFunction != NULL )
-                    {
-                        save( undoList, map, mapRow, mapCol, player, enemy ); 
-                        (*pFunction)( map, &player, &enemy ); /* moves player */
-                    }
-                }
-            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) && (command != '0')); /*game is not won and not lost */
-
-            enableBuffer();
+            command = playGame(&map, mapRow, mapCol, &player, &enemy, &goal);
             
             if (command == '0')
             {
-                /* exiting game */
-                printf( "Exiting game...\n" );
-                
-                do
-                { 
-                    /* save progress prompt */
-                    printf( "Do you want to save your progress? [y/n]\n" );
-                    scanf( " %c", &option );
-                    if ((option != 'y') && (option != 'n' ))
-                    {
-                        /* print error */
-                        printf("ERROR: %c is an invalid option. Please select y or n",option);
-                    }
-                
-                } while ( !((option == 'y') || (option == 'n' ) )); /* correct option has not been selected */
-
-                if (option == 'y')
-                {
-                    /* save progress */
-                    writeSaveFile( "map.out", map, mapRow, mapCol, metadataAmount);
-                }
+                exitGame(map, mapRow, mapCol, metadataAmount);
                 
             }
             else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
@@ -146,12 +171,12 @@ int main( int argc, char *argv[] )
             }
             
             /* free malloced memory */
-            freeSavedMap( undoList, mapRow );
+            /*freeSavedMap( undoList, mapRow );*/
         }
         
         /* free malloced memory */
-        freeLinkedList( undoList, &free );
-        free( undoList );
+        /*freeLinkedList( undoList, &free );*/
+        /*free( undoList );*/
         freeMap( map, mapRow );
     }
     else
@@ -161,3 +186,4 @@ int main( int argc, char *argv[] )
     }
     return 0;
 }
+
