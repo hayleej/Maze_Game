@@ -20,8 +20,9 @@ void printTitle( int length )
 
     /* print top border */
     printBorder(length);
-    
+    printf("\033[1m");
     printLine("Maze Game!", length);
+    printf("\033[0m");
     
     /* print bottom border */
     printBorder(length);
@@ -40,15 +41,15 @@ void printStartScreen( char * errorLevelMessage, int length )
 
     /* print top border */
     printBorder(length);
-    
+    printf("\033[1m");
     printLine("Welcome to", length);
-    printLine("Maze Game", length);
-    
+    printLine("Maze Game!", length);
+    printf("\033[0m");
     /* print bottom border */
     printBorder(length);
-
+    printf("\033[3m");
     printLine("Select 0 at any time to exit the game", length);
-
+    printf("\033[0m");
     printBorder(length);
     
     printLine("Select your difficulty level:", length);
