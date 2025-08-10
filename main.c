@@ -44,11 +44,11 @@ int main( int argc, char *argv[] )
             scanf( " %c", &option );
             strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
             errorLevelMessage[7] = option;
-        } while ( !((option == '1') || (option == '2' ) || (option == '0' )) ); /* correct option has not been selected */
+        } while ( !((option == '1') || (option == '2' ) || (option == '3' ) || (option == '0' )) ); /* correct option has not been selected */
 
         enableBuffer();
 
-        if (option == '2')
+        if (option == '3')
         {
             /* enter custom map path */
             system( "clear" );
@@ -68,6 +68,11 @@ int main( int argc, char *argv[] )
             } while ((map == NULL) && (strcmp(map_path,"0") != 0)); /* until map_path is correct or 0 is used to exit */
             
             
+        }
+        else if (option == '2')
+        {
+            /* load saved map */
+            map = readFile( "map.out", &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
         }
         else
         {   

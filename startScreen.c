@@ -73,8 +73,9 @@ void printStartScreen( char * errorLevelMessage, int length )
     
     /* map option */
     printLine("Select game option:", length);
-    printLine("(1) normal    ", length);
-    printLine("(2) custom map", length);
+    printLine("(1) start new game ", length);
+    printLine("(2) load saved game", length);
+    printLine("(3) open custom map", length);
     
 
     printBorder(length);
