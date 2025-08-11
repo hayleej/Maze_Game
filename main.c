@@ -58,9 +58,26 @@ int playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject
 }
 
 
-void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount)
+/* should have function for saving game */
+void saveGame(SavedGames savedGames, char* name, char* map_file, int level)
+{
+    /* get current time as last played */
+    time_t now = time(NULL);
+    struct tm * lastPlayed = localtime(&now);
+    /* add game to saved games list */
+    addToSavedGamesList(&savedGames, createGame(name, map_file, level, lastPlayed));
+    
+    /* output to saved games file */
+    writeSavedGames("saved/savedGames.out", savedGames);
+
+}
+
+void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount, SavedGames savedGames, int level, char * gameName)
 {
     char option;
+    char saved_map_name[25];
+    char saved_map_path[36] ="saved/";
+    char * sPtr;
     /* exiting game */
     printf( "Exiting game...\n" );
     
@@ -68,6 +85,7 @@ void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount)
     { 
         /* save progress prompt */
         printf( "Do you want to save your progress? [y/n]\n" );
+        disableBuffer();
         scanf( " %c", &option );
         if ((option != 'y') && (option != 'n' ))
         {
@@ -76,11 +94,69 @@ void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount)
         }
     
     } while ( !((option == 'y') || (option == 'n' ) )); /* correct option has not been selected */
-
+    enableBuffer();
     if (option == 'y')
     {
-        /* save progress */
-        writeSaveFile( "map.out", map, mapRow, mapCol, metadataAmount);
+        if (gameName == NULL)
+        {
+            /* ask for name of saved game */
+            do
+            {
+                printf("Enter name of game to save:\n");
+                /* select path to output saved game map */
+                sPtr = fgets(saved_map_name, sizeof(saved_map_name), stdin);
+                if ( sPtr == NULL )
+                {
+                    if (ferror(stdin))
+                    {
+                        perror("Error reading name of saved game");
+                    }
+                    
+                }
+                else
+                {
+                    saved_map_name[strcspn(saved_map_name, "\n")] = 0; /* Remove the newline character if present */
+                    
+                    strcat(saved_map_path, saved_map_name);
+                    strcat(saved_map_path, ".out");
+
+                    printf("Confirm the saved game name: \033[1m%s\033[0m? [y/n]", saved_map_name);
+
+                    disableBuffer();
+                    scanf( " %c", &option );
+                    enableBuffer();
+                }
+            } while ((option != 'y') && (option != '0')); /* until confirmed name or 0 used to exit */
+            
+        }
+        else
+        {
+            do
+            {
+                printf("Confirm the saved game name: \033[1m%s\033[0m? [y/n]", gameName);
+
+                disableBuffer();
+                scanf( " %c", &option );
+                enableBuffer();
+            } while ((option != 'y') && (option != '0')); /* until confirmed name or 0 used to exit */
+
+            if (option == 'y')
+            {
+                strcpy(saved_map_name, gameName);
+                strcat(saved_map_path, saved_map_name);
+                strcat(saved_map_path, ".out");
+            }
+            
+        }
+        
+        if (option == 'y')
+        {
+            /* save progress */
+            writeSaveFile( saved_map_path, map, mapRow, mapCol, metadataAmount);
+            saveGame(savedGames, saved_map_name, saved_map_path, level);
+        }
+        
+        
     }
 }
 
@@ -95,8 +171,11 @@ int main( int argc, char *argv[] )
     char command;
     char option;
     char map_path [100];
-    char errorLevelMessage[52];
+    char errorLevelMessage[55];
     SavedGames savedGames;
+    char * sPtr;
+    int level = 1;
+    char * gameName = NULL;
     
 
     if ( argc == 2 )
@@ -106,13 +185,12 @@ int main( int argc, char *argv[] )
             /* display start screen */
             printStartScreen(errorLevelMessage, MIN_LENGTH);
             /* read saved games file */
-            savedGames = readSavedGames("savedGames.txt");
+            savedGames = readSavedGames("saved/savedGames.out");
             displaySavedGames(savedGames);
-            freeSavedGames(savedGames);
             disableBuffer();
             /* select map option*/
-            scanf( " %c", &option );
-            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
+            scanf( "%c", &option );
+            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1, 2 or 3");
             errorLevelMessage[7] = option;
         } while ( !((option == '1') || (option == '2' ) || (option == '3' ) || (option == '0' )) ); /* correct option has not been selected */
 
@@ -127,7 +205,15 @@ int main( int argc, char *argv[] )
             {
                 printf("Enter path to custom map:\n");
                 /* select path to custom map */
-                fgets(map_path, sizeof(map_path), stdin);
+                sPtr = fgets(map_path, sizeof(map_path), stdin);
+                if ( sPtr == NULL )
+                {
+                    if (ferror(stdin))
+                    {
+                        perror("Error reading path of custom map");
+                    }
+                    
+                }
                 map_path[strcspn(map_path, "\n")] = 0; /* Remove the newline character if present */
                 if (strcmp(map_path,"0") != 0)
                 {
@@ -146,7 +232,9 @@ int main( int argc, char *argv[] )
         }
         else
         {   
-            map = readFile( "maps/level1.txt", &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
+            char mapfile[16] = "maps/levelx.txt";
+            mapfile[10] = level + '0';
+            map = readFile( mapfile, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
         }
         
 
@@ -155,9 +243,17 @@ int main( int argc, char *argv[] )
             /* map has been initialized */
             command = playGame(&map, mapRow, mapCol, &player, &enemy, &goal);
             
+            if ((gameName != NULL) && (command != '0'))
+            {
+                /* if won or lost saved game remove from saved games */
+                removeGameFromSavedGames(&savedGames, gameName);
+                /* update saved games file */
+                writeSavedGames("saved/savedGames.out", savedGames);
+            }
+            
             if (command == '0')
             {
-                exitGame(map, mapRow, mapCol, metadataAmount);
+                exitGame(map, mapRow, mapCol, metadataAmount, savedGames, level, gameName);
                 
             }
             else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
@@ -177,6 +273,7 @@ int main( int argc, char *argv[] )
         
         /* free malloced memory */
         freeMap( map, mapRow );
+        freeSavedGames(savedGames);
     }
     else
     { 

@@ -156,7 +156,7 @@ SavedGames readSavedGames(char * filename)
             /* read name, map file, level, and date and time from file */
             for ( i = 0; i < size; i++ )
             {
-                nRead = fscanf( inFile, "%s %s %d %d %d %d %d %d", gameName, map_file, &level, &day, &month, &year, &hour, &minute );
+                nRead = fscanf( inFile, "%s %s %d %d %d %d %d %d\n", gameName, map_file, &level, &day, &month, &year, &hour, &minute );
 
                 if ( nRead != 8 || nRead == EOF)
                 {
@@ -173,11 +173,6 @@ SavedGames readSavedGames(char * filename)
                     /* add game to saved games */
                     addToSavedGamesList(&savedGames, createGame(gameName, map_file, level, lastPlayed));
                     
-                    if (size != savedGames.size)
-                    {
-                        perror( "Error reading from file: number of saved games does not match" );
-                    }
-                    
                 }
             }
         }
@@ -190,4 +185,35 @@ SavedGames readSavedGames(char * filename)
         fclose( inFile );
     }
     return savedGames;
+}
+
+
+void writeSavedGames(char * filename, SavedGames savedGames)
+{
+
+    /* format of file is:
+    * first line contains number of how many saved games
+    * [name of game] [map.out] [level] [day] [month] [year] [hour] [minute]
+    * */
+    int i = 0;
+
+    FILE* outFile = fopen(filename, "w");
+
+    /* write first line of file containing the number of saved games */
+    fprintf(outFile, "%d\n", savedGames.size);
+
+    
+    /* read row, column, and object from map, and output to saved file */
+    for ( i = 0; i < savedGames.size; i++ )
+    {
+        fprintf(outFile, "%s %s %d %d %d %d %d %d\n", savedGames.games[i]->name, 
+            savedGames.games[i]->map_file, savedGames.games[i]->level, 
+            savedGames.games[i]->last_played->tm_mday, 
+            savedGames.games[i]->last_played->tm_mon, 
+            savedGames.games[i]->last_played->tm_year, 
+            savedGames.games[i]->last_played->tm_hour, 
+            savedGames.games[i]->last_played->tm_min);     
+    }
+    
+    fclose( outFile );
 }

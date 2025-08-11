@@ -10,7 +10,14 @@
 #include <stdio.h>
 #include "settings.h"
 
-
+/**
+ * @brief  creates Game to save  
+ * @param  name: name of the saved game
+ * @param  mapFile: path to the saved map file
+ * @param  level: the level the player is up to
+ * @param  lastPlayed: struct tm of the date and time the game was last played
+ * @retval the saved game
+ */
 Game* createGame(char* name, char* mapFile, int level, struct tm * lastPlayed)
 {
     Game* game = (Game*)malloc(sizeof(Game));
@@ -26,6 +33,35 @@ void addToSavedGamesList(SavedGames* savedGames, Game* game)
 {
     savedGames->games[savedGames->size++] = game;
 }
+
+/* Function to check if a point is in a list*/
+int isInSavedGames(SavedGames* savedGames, char* name)
+{
+    int index = -1;
+    int i = 0;
+    for (i = 0; i < savedGames->size; i++) {
+        if (strcmp(savedGames->games[i]->name, name)) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+Game * removeGameFromSavedGames(SavedGames * savedGames, char * name)
+{
+    int index = isInSavedGames(savedGames, name);
+    if (index != - 1)
+    {
+        /* is in savedGames */
+        savedGames->games[index] = savedGames->games[--savedGames->size];
+    }
+}
+
+/**
+ * @brief  displays the name and last played of the list of saved games
+ * @param  savedGames: list of saved games
+ * @retval None
+ */
 void displaySavedGames(SavedGames savedGames)
 {
     int i;
@@ -59,16 +95,6 @@ void displaySavedGames(SavedGames savedGames)
     
     
     /* file layout is the number of saved games\n then each line is the name, last played, mapfile, and level*/
-
-}
-
-
-/* should have function for saving game */
-void saveGame(SavedGames savedGames, char* name, char* map_file, int level)
-{
-    /*Game game = {name, time(NULL), map_file, level};*/
-
-    /* output to saved games file */
 
 }
 

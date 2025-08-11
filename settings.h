@@ -30,4 +30,6 @@ Game* createGame(char* name, char* mapFile, int level, struct tm * lastPlayed);
 void addToSavedGamesList(SavedGames* savedGames, Game* game);
 void displaySavedGames(SavedGames savedGames);
 void freeSavedGames( SavedGames savedGames);
+Game * removeGameFromSavedGames(SavedGames * savedGames, char * name);
+
 #endif
