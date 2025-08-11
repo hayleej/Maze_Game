@@ -41,5 +41,6 @@ void undo( LinkedList * undoList, char *** map, MapObject * player, MapObject * 
 void copy( char ** saveMap, char ** map, int mapRow, int mapCol );
 void save( LinkedList * undoList, char ** map, int mapRow, int mapCol, MapObject player, MapObject enemy );
 void freeSavedMap( LinkedList * undoList, int mapRow );
+char playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal);
 
 #endif

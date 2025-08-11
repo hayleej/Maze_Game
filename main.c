@@ -16,46 +16,7 @@
 #include "startScreen.h"
 #include "settings.h"
 
-int playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal)
-{
-    LinkedList * undoList = NULL; 
-    char command;
-    CommandPtr pFunction;
-    /* map has been initialized */
 
-    undoList = createLinkedList(); 
-
-    do
-    { 
-        printMap( *map, mapRow, mapCol );
-
-        disableBuffer();
-        scanf( " %c", &command );
-        
-        if ( command == 'u' )
-        {
-            undo( undoList, map, player, enemy, mapRow );
-        }
-        else if (command != '0')
-        {
-            pFunction = controlFunc( command );
-            if ( pFunction != NULL )
-            {
-                save( undoList, *map, mapRow, mapCol, *player, *enemy ); 
-                (*pFunction)( *map, player, enemy ); /* moves player */
-            }
-        }
-    } while ( !( ( player->row == goal->row ) && ( player->col == goal->col ) ) && !( ( player->row == enemy->row ) && ( player->col == enemy->col ) ) && (command != '0')); /*game is not won and not lost */
-
-    enableBuffer();
-    
-    /* free malloced memory */
-    freeSavedMap( undoList, mapRow );
-    freeLinkedList( undoList, &free );
-    free( undoList );
-
-    return command;
-}
 
 
 /* should have function for saving game */
