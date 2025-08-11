@@ -14,6 +14,7 @@
 #include "fileIO.h"
 #include "linkedList.h"
 #include "startScreen.h"
+#include "settings.h"
 
 int playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal)
 {
@@ -94,18 +95,20 @@ int main( int argc, char *argv[] )
     char command;
     char option;
     char map_path [100];
-    CommandPtr pFunction;
     char errorLevelMessage[52];
+    SavedGames savedGames;
     
 
     if ( argc == 2 )
-    { 
-        /*undoList = createLinkedList(); */
-        
+    {   
         do
         { 
             /* display start screen */
             printStartScreen(errorLevelMessage, MIN_LENGTH);
+            /* read saved games file */
+            savedGames = readSavedGames("savedGames.txt");
+            displaySavedGames(savedGames);
+            freeSavedGames(savedGames);
             disableBuffer();
             /* select map option*/
             scanf( " %c", &option );
@@ -170,13 +173,9 @@ int main( int argc, char *argv[] )
                 printf( "You Lost!\n" );
             }
             
-            /* free malloced memory */
-            /*freeSavedMap( undoList, mapRow );*/
         }
         
         /* free malloced memory */
-        /*freeLinkedList( undoList, &free );*/
-        /*free( undoList );*/
         freeMap( map, mapRow );
     }
     else

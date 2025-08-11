@@ -111,3 +111,83 @@ void writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int met
     
     fclose( outFile );
 }
+
+
+/**
+ * @brief  reads file containing saved games 
+ * @param  filename: name of the file containing saved games
+ * @retval saved games
+ */
+SavedGames readSavedGames(char * filename)
+{
+
+    /* format of file is:
+    * first line contains number of how many saved games
+    * [name of game] [map.out] [level] [day] [month] [year] [hour] [minute]
+    * */
+    SavedGames savedGames = { 0 };
+    FILE* inFile = fopen(filename, "r");
+    int nRead = 0;
+    int i = 0;
+    int day, month, year, hour, minute;
+    char gameName[25];
+    time_t now = time(NULL);
+    struct tm * lastPlayed = localtime(&now);
+    char map_file[100];
+    int level; /* level = -1 when not playing levels */
+    int size;
+
+    if ( inFile == NULL )
+    {
+        perror( "Error opening the file" );
+    }
+    else
+    {
+        /* reading first line of file containing metadataAmount, mapRow and mapCol */
+        nRead = fscanf( inFile, "%d", &size );
+
+        if ( nRead != 1 || nRead == EOF )
+        {
+            perror( "Error reading from file" );
+        }
+        else
+        {
+
+            /* read name, map file, level, and date and time from file */
+            for ( i = 0; i < size; i++ )
+            {
+                nRead = fscanf( inFile, "%s %s %d %d %d %d %d %d", gameName, map_file, &level, &day, &month, &year, &hour, &minute );
+
+                if ( nRead != 8 || nRead == EOF)
+                {
+                    perror( "Error reading from file" );
+                }
+                else
+                {
+                    lastPlayed->tm_mday = day;
+                    lastPlayed->tm_mon = month;
+                    lastPlayed->tm_year = year;
+                    lastPlayed->tm_hour = hour;
+                    lastPlayed->tm_min = minute;
+
+                    /* add game to saved games */
+                    addToSavedGamesList(&savedGames, createGame(gameName, map_file, level, lastPlayed));
+                    
+                    if (size != savedGames.size)
+                    {
+                        perror( "Error reading from file: number of saved games does not match" );
+                    }
+                    
+                }
+            }
+        }
+    
+        if ( ferror( inFile ) )
+        {
+            perror( "Error reading from file" );
+        }
+
+        fclose( inFile );
+    }
+    return savedGames;
+}

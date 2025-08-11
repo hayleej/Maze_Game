@@ -36,6 +36,8 @@ void printTitle( int length )
     printf("\033[3m");
     printLine("Select 0 at any time to exit the game", length);
     printf("\033[0m");
+
+    /* print bottom border */
     printBorder(length);
 }
 
@@ -144,4 +146,22 @@ void printBorder( int length)
         printf( "* " );
     }
     printf("*\n");
+}
+
+void printDivider(int length)
+{
+    int i;
+
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+
+    /* print line of ---- */
+    printf( "*" );
+    for ( i = 1; i < length-1; i+=1 )
+    { 
+        printf( "-" );
+    }
+    printf( "*\n" );
 }

@@ -9,8 +9,10 @@
 #define FILEIO_H 
 
 #include "map.h"
+#include "settings.h"
 
 char** readFile( char* filename, int * mapRow, int * mapCol, MapObject * player, MapObject * enemy, MapObject * goal, int * metadataAmount );
 void writeSaveFile( char* filename, char ** map, int mapRow, int mapCol, int metadataAmount);
+SavedGames readSavedGames(char * filename);
 
 #endif

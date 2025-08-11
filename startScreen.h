@@ -17,5 +17,6 @@ void printBorder( int length);
 void printStartScreen( char * errorLevelMessage, int length );
 void printLine( char * line, int length);
 void printTitle( int length ); 
+void printDivider(int length);
 
 #endif

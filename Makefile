@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -Wall -pedantic -ansi -g
-OBJ = main.o map.o game.o terminal.o fileIO.o linkedList.o searchAlgorithm.o enemy.o startScreen.o
+OBJ = main.o map.o game.o terminal.o fileIO.o linkedList.o searchAlgorithm.o enemy.o startScreen.o settings.o
 EXEC = maze
 
 
 $(EXEC) : $(OBJ)
 		$(CC) $(OBJ) -o $(EXEC)
 
-main.o : main.c game.h map.h fileIO.h linkedList.h
+main.o : main.c game.h map.h fileIO.h linkedList.h settings.h
 			$(CC) -c main.c $(CFLAGS)
 
 game.o : game.c terminal.h game.h map.h linkedList.h enemy.h
@@ -19,7 +19,7 @@ map.o : map.c map.h
 terminal.o : terminal.c terminal.h
 			$(CC) -c terminal.c $(CFLAGS)
 
-fileIO.o : fileIO.c fileIO.h map.h
+fileIO.o : fileIO.c fileIO.h map.h settings.h
 			$(CC) -c fileIO.c $(CFLAGS)
 
 linkedList.o : linkedList.c linkedList.h
@@ -33,6 +33,9 @@ enemy.o : enemy.c enemy.h searchAlgorithm.h
 
 startScreen.o : startScreen.c startScreen.h terminal.h
 			$(CC) -c startScreen.c $(CFLAGS)
+
+settings.o : settings.c settings.h startScreen.h
+			$(CC) -c settings.c $(CFLAGS)
 
 clean :
 			rm -f $(EXEC) $(OBJ)
