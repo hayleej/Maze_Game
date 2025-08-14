@@ -170,7 +170,15 @@ int main( int argc, char *argv[] )
             if ((game != NULL) && (command != EXIT_GAME))
             {
                 /* if won or lost saved game remove from saved games */
-                removeGameFromSavedGames(&savedGames, game->name);
+                game = removeGameFromSavedGames(&savedGames, game->name);
+                
+                /* remove map file from saved/ folder */
+                if(remove(game->map_file) != 0)
+                {
+                    /* error deleting file */
+                    printf("Error: Unable to delete the file: %s.\n", game->map_file);
+                }
+                free(game);
                 /* update saved games file */
                 writeSavedGames("saved/savedGames.out", savedGames);
             }
