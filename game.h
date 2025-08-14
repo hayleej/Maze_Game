@@ -14,10 +14,16 @@
 #include "linkedList.h"
 #include "enemy.h"
 #include "startScreen.h"
-
+#include "settings.h"
+#include "fileIO.h"
 
 #define FALSE 0
 #define TRUE !FALSE
+
+#define MAX_LEVEL 3
+#define EXIT_GAME '0'
+#define LOST_GAME 'L'
+#define WON_GAME 'W'
 
 
 typedef void (*CommandPtr)(char **, MapObject *, MapObject *);
@@ -41,5 +47,10 @@ void undo( LinkedList * undoList, char *** map, MapObject * player, MapObject * 
 void copy( char ** saveMap, char ** map, int mapRow, int mapCol );
 void save( LinkedList * undoList, char ** map, int mapRow, int mapCol, MapObject player, MapObject enemy );
 void freeSavedMap( LinkedList * undoList, int mapRow );
+char playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal);
+void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount, SavedGames savedGames, int level, Game * game);
+char * getGameName();
+void updateSavedGame(SavedGames savedGames, Game * game, int level);
+void saveGame(SavedGames savedGames, char* name, char* map_file, int level);
 
 #endif

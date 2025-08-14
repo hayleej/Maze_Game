@@ -2,7 +2,6 @@
  * File Name: main.c
  * Author: Haylee Jackson
  * Purpose: the main function for the maze game
- * Last Modified: 09/10/2021
  * 
 */ 
 
@@ -10,10 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "game.h"
-#include "map.h"
-#include "fileIO.h"
-#include "linkedList.h"
-#include "startScreen.h"
+
 
 int main( int argc, char *argv[] )
 { 
@@ -22,112 +18,167 @@ int main( int argc, char *argv[] )
     MapObject enemy = {'~', 0, 0};
     MapObject goal = {'x', 0, 0};
     char ** map = NULL;
-    int  mapRow = 0, mapCol = 0;
+    int  mapRow = 0, mapCol = 0, metadataAmount = 0;
     char command;
     char option;
     char map_path [100];
-    CommandPtr pFunction;
-    LinkedList * undoList = NULL; 
-    char errorLevelMessage[52];
-    
+    char errorLevelMessage[55];
+    SavedGames savedGames;
+    char * sPtr;
+    int level = 1;
+    Game * game = NULL;
+    char mapfile[16] = "maps/levelx.txt";
 
-    if ( argc == 2 )
-    { 
-        undoList = createLinkedList(); 
-        
+    if ( argc == 1 )
+    {   
+        /* read saved games file */
+        savedGames = readSavedGames("saved/savedGames.out");
         do
         { 
             /* display start screen */
             printStartScreen(errorLevelMessage, MIN_LENGTH);
+            
             disableBuffer();
             /* select map option*/
-            scanf( " %c", &option );
-            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1 or 2");
+            scanf( "%c", &option );
+            strcpy(errorLevelMessage, "ERROR: x is an invalid option. Please select 1, 2 or 3");
             errorLevelMessage[7] = option;
-        } while ( !((option == '1') || (option == '2' ) || (option == '0' )) ); /* correct option has not been selected */
+        } while ( !((option == '1') || (option == '2' ) || (option == '3' ) || (option == EXIT_GAME )) ); /* correct option has not been selected */
 
         enableBuffer();
 
-        if (option == '2')
+        /* load game map */
+        if (option == '3')
         {
+            /* enter custom map path */
             system( "clear" );
             printTitle(MIN_LENGTH);
+            printExitCommandInfo(MIN_LENGTH);
             do
             {
-                /* enter custom map path */
                 printf("Enter path to custom map:\n");
                 /* select path to custom map */
-                fgets(map_path, sizeof(map_path), stdin); // Read input as a string
-                map_path[strcspn(map_path, "\n")] = 0; // Remove the newline character if present
+                sPtr = fgets(map_path, sizeof(map_path), stdin);
+                if ( sPtr == NULL )
+                {
+                    if (ferror(stdin))
+                    {
+                        perror("Error reading path of custom map");
+                    }
+                    
+                }
+                map_path[strcspn(map_path, "\n")] = 0; /* Remove the newline character if present */
                 if (strcmp(map_path,"0") != 0)
                 {
                     /* so to not print error opening file when trying to exit */
-                    map = readFile( map_path, &mapRow, &mapCol, &player, &enemy, &goal );
+                    map = readFile( map_path, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
                 }
                 
             } while ((map == NULL) && (strcmp(map_path,"0") != 0)); /* until map_path is correct or 0 is used to exit */
             
+            level = -1; /* for custom map */
+        }
+        else if (option == '2')
+        {
+            /* load saved games */
+
+            char upperOption = savedGames.size + '0';
+            do
+            {
+                /* display saved games */
+                displaySavedGames(savedGames);
+                printLine("Which game do you want to load?", MIN_LENGTH);
+                disableBuffer();
+                /* select saved game option*/
+                scanf( "%c", &option );
+            } while ((option != EXIT_GAME) && (option < '1') && (option > upperOption)); /* until a saved game is chosen or exit game */
             
+            enableBuffer();
+            if (option != EXIT_GAME)
+            {
+                /* get saved game */
+                game = savedGames.games[(option + 0) - 49];
+                /* load saved map */
+                map = readFile( game->map_file, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
+                level = game->level; /* update level */
+            }
         }
         else
         {   
-            map = readFile( argv[1], &mapRow, &mapCol, &player, &enemy, &goal );
+            /* start new game */
+            mapfile[10] = level + '0';
+            map = readFile( mapfile, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
         }
         
-
-        if ((map != NULL) && (option != '0')) /* user hasn't exited game */
+        /* play game */
+        if ((map != NULL) && (option != EXIT_GAME)) /* user hasn't exited game */
         {
             /* map has been initialized */
-            do
-            { 
-                printMap( map, mapRow, mapCol );
+            command = playGame(&map, mapRow, mapCol, &player, &enemy, &goal);
 
-                disableBuffer();
-                scanf( " %c", &command );
+            if (command == EXIT_GAME)
+            {
+                /* exit game and save */
+                exitGame(map, mapRow, mapCol, metadataAmount, savedGames, level, game);
+            }
+            else if ((command == WON_GAME) && (level != -1) && (level < MAX_LEVEL))
+            {
+                do
+                { 
+                    /* Won game, playing levels, not on last level */
+                    level ++;
+
+                    /* read map of next level */
+                    freeMap( map, mapRow );
+                    mapfile[10] = level + '0';
+                    map = readFile( mapfile, &mapRow, &mapCol, &player, &enemy, &goal, &metadataAmount );
+                    /* play game */
+                    command = playGame(&map, mapRow, mapCol, &player, &enemy, &goal);
+                } while ((command == WON_GAME) && (level < MAX_LEVEL)); /* won game and still more levels */
                 
-                if ( command == 'u' )
+                if (command == EXIT_GAME)
                 {
-                    undo( undoList, &map, &player, &enemy, mapRow );
+                    /* exit and save game */
+                    exitGame(map, mapRow, mapCol, metadataAmount, savedGames, level, game);
                 }
-                else if (command != '0')
+                else if (command == LOST_GAME)
                 {
-                    pFunction = controlFunc( command );
-                    if ( pFunction != NULL )
-                    {
-                        save( undoList, map, mapRow, mapCol, player, enemy ); 
-                        (*pFunction)( map, &player, &enemy ); /* moves player */
-                    }
+                    /* lost game */
+                    printMap( map, mapRow, mapCol );
+                    printf( "You Lost!\n" );
                 }
-            } while ( !( ( player.row == goal.row ) && ( player.col == goal.col ) ) && !( ( player.row == enemy.row ) && ( player.col == enemy.col ) ) && (command != '0')); /*game is not won and not lost */
-
-            enableBuffer();
-            
-            if (command == '0')
-            {
-                /* exiting game */
-                printf( "Exiting game...\n" );
+                else
+                {
+                    /* won final level */
+                    printMap( map, mapRow, mapCol );
+                    printf( "You Win!\n" );
+                }
             }
-            else if ( ( player.row == goal.row ) && ( player.col == goal.col ) )
+            else if (command == LOST_GAME)
             {
-                /* game is won */
-                printMap( map, mapRow, mapCol );
-                printf( "You Win!\n" );
-            }
-            else
-            {
-                /* game is lost */
+                /* lost game (custom or level game) */
                 printMap( map, mapRow, mapCol );
                 printf( "You Lost!\n" );
             }
+            else if (level == -1)
+            {
+                /* won custom game */
+                printMap( map, mapRow, mapCol );
+                printf( "You Win!\n" );
+            }
             
-            /* free malloced memory */
-            freeSavedMap( undoList, mapRow );
+            if ((game != NULL) && (command != EXIT_GAME))
+            {
+                /* if won or lost saved game remove from saved games */
+                removeGameFromSavedGames(&savedGames, game->name);
+                /* update saved games file */
+                writeSavedGames("saved/savedGames.out", savedGames);
+            }
         }
         
         /* free malloced memory */
-        freeLinkedList( undoList, &free );
-        free( undoList );
         freeMap( map, mapRow );
+        freeSavedGames(savedGames);
     }
     else
     { 
@@ -136,3 +187,4 @@ int main( int argc, char *argv[] )
     }
     return 0;
 }
+

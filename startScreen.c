@@ -17,7 +17,7 @@
  */
 void printTitle( int length )
 {
-
+    system( "clear" );
     if (length < MIN_LENGTH)
     {
         length = MIN_LENGTH;
@@ -29,13 +29,28 @@ void printTitle( int length )
     printf("\033[1m");
     printLine("Maze Game!", length);
     printf("\033[0m");
-
-    /* print bottom border */
     printBorder(length);
+}
+
+/**
+ * @brief  prints the "Select 0 at any time to exit" line with border
+ * @param  length: the number of characters per line
+ * @retval None
+ */
+void printExitCommandInfo( int length )
+{
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+    /* print bottom border */
+    /*printBorder(length);*/
 
     printf("\033[3m");
     printLine("Select 0 at any time to exit the game", length);
     printf("\033[0m");
+
+    /* print bottom border */
     printBorder(length);
 }
 
@@ -73,8 +88,9 @@ void printStartScreen( char * errorLevelMessage, int length )
     
     /* map option */
     printLine("Select game option:", length);
-    printLine("(1) normal    ", length);
-    printLine("(2) custom map", length);
+    printLine("(1) start new game ", length);
+    printLine("(2) load saved game", length);
+    printLine("(3) open custom map", length);
     
 
     printBorder(length);
@@ -143,4 +159,22 @@ void printBorder( int length)
         printf( "* " );
     }
     printf("*\n");
+}
+
+void printDivider(int length)
+{
+    int i;
+
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+
+    /* print line of ---- */
+    printf( "*" );
+    for ( i = 1; i < length-1; i+=1 )
+    { 
+        printf( "-" );
+    }
+    printf( "*\n" );
 }

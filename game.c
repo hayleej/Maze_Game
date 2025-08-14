@@ -11,6 +11,209 @@
 #include "game.h"
 
 
+char playGame(char *** map, int mapRow, int mapCol, MapObject * player, MapObject * enemy, MapObject * goal)
+{
+    LinkedList * undoList = NULL; 
+    char command;
+    CommandPtr pFunction;
+    /* map has been initialized */
+
+    undoList = createLinkedList(); 
+
+    do
+    { 
+        printMap( *map, mapRow, mapCol );
+
+        disableBuffer();
+        scanf( " %c", &command );
+        
+        if ( command == 'u' )
+        {
+            undo( undoList, map, player, enemy, mapRow );
+        }
+        else if (command != EXIT_GAME)
+        {
+            pFunction = controlFunc( command );
+            if ( pFunction != NULL )
+            {
+                save( undoList, *map, mapRow, mapCol, *player, *enemy ); 
+                (*pFunction)( *map, player, enemy ); /* moves player */
+            }
+        }
+    } while ( !( ( player->row == goal->row ) && ( player->col == goal->col ) ) && !( ( player->row == enemy->row ) && ( player->col == enemy->col ) ) && (command != EXIT_GAME)); /*game is not won and not lost */
+
+    if ( ( player->row == goal->row ) && ( player->col == goal->col ) )
+    {
+        /* won game */
+        command = WON_GAME;
+    }
+    else if (( player->row == enemy->row ) && ( player->col == enemy->col ))
+    {
+        /* lost game */
+        command = LOST_GAME;
+    }
+    
+    
+    enableBuffer();
+    
+    /* free malloced memory */
+    freeSavedMap( undoList, mapRow );
+    freeLinkedList( undoList, &free );
+    free( undoList );
+
+    return command;
+}
+
+
+
+/* should have function for saving game */
+void saveGame(SavedGames savedGames, char* name, char* map_file, int level)
+{
+    /* get current time as last played */
+    time_t now = time(NULL);
+    struct tm * lastPlayed = localtime(&now);
+    /* add game to saved games list */
+    addToSavedGamesList(&savedGames, createGame(name, map_file, level, lastPlayed));
+    
+    /* output to saved games file */
+    writeSavedGames("saved/savedGames.out", savedGames);
+
+}
+
+void updateSavedGame(SavedGames savedGames, Game * game, int level)
+{
+    /* get current time as last played */
+    time_t now = time(NULL);
+    struct tm * lastPlayed = localtime(&now);
+    /* update game in saved games list */
+    game->level = level;
+    game->last_played = lastPlayed;
+
+    /* output to saved games file */
+    writeSavedGames("saved/savedGames.out", savedGames);
+}
+
+
+char * getGameName()
+{
+    char option;
+    char * saved_map_name = (char *) malloc(sizeof(char) * 25);
+    char * sPtr;
+    do
+    {
+        printf("Enter name of game to save:\n");
+        /* select path to output saved game map */
+        sPtr = fgets(saved_map_name, sizeof(char)*25, stdin);
+        if ( sPtr == NULL )
+        {
+            if (ferror(stdin))
+            {
+                perror("Error reading name of saved game\n");
+            }
+            
+        }
+        else
+        {
+            saved_map_name[strcspn(saved_map_name, "\n")] = 0; /* Remove the newline character if present */
+            
+            printf("Confirm the saved game name: \033[1m%s\033[0m? [y/n]\n", saved_map_name);
+
+            disableBuffer();
+            scanf( " %c", &option );
+            enableBuffer();
+        }
+    } while ((option != 'y') && (option != EXIT_GAME)); /* until confirmed name or 0 used to exit */
+    
+    if (option == EXIT_GAME)
+    {
+        /* making sure it is still NULL */
+        free(saved_map_name);
+        saved_map_name = NULL;
+    }
+    
+    return saved_map_name;
+}
+void exitGame(char ** map, int mapRow, int mapCol, int metadataAmount, SavedGames savedGames, int level, Game * game)
+{
+    char option;
+    char * saved_map_name = NULL; /* 25 characters - specified in getGameName*/
+    char saved_map_path[36] ="saved/";
+    char * sPtr;
+    /* exiting game */
+    printf( "Exiting game...\n" );
+    
+    do
+    { 
+        /* save progress prompt */
+        printf( "Do you want to save your progress? [y/n]\n" );
+        disableBuffer();
+        scanf( " %c", &option );
+        if ((option != 'y') && (option != 'n' ))
+        {
+            /* print error */
+            printf("ERROR: %c is an invalid option. Please select y or n.\n",option);
+        }
+    
+    } while ( !((option == 'y') || (option == 'n' ) )); /* correct option has not been selected */
+    enableBuffer();
+    if (option == 'y')
+    {
+        if (game == NULL)
+        {
+            /* ask for name of saved game */
+            saved_map_name = getGameName();
+        }
+        else
+        {
+            do
+            {
+                printf("Confirm the saved game name: \033[1m%s\033[0m? [y/n]\n", game->name);
+
+                disableBuffer();
+                scanf( " %c", &option );
+                enableBuffer();
+            } while ((option != 'y') && (option != 'n') && (option != EXIT_GAME)); /* until confirmed name or 0 used to exit */
+
+            if (option == 'y')
+            {
+                saved_map_name = (char *) malloc(sizeof(char) * 25);
+                strcpy(saved_map_name, game->name);
+            }
+            else if (option == 'n')
+            {
+                level = game->level;
+                saved_map_name = getGameName();
+                free(removeGameFromSavedGames(&savedGames, game->name)); /* remove it so you can add it properly with new name */
+                game = NULL;        
+            }
+        }
+        
+        if ((saved_map_name != NULL) && (option != EXIT_GAME))
+        {
+            strcat(saved_map_path, saved_map_name);
+            strcat(saved_map_path, ".out");
+            /* save progress */
+            writeSaveFile( saved_map_path, map, mapRow, mapCol, metadataAmount);
+            if (game == NULL)
+            {
+                /* adding game to savedGames */
+                saveGame(savedGames, saved_map_name, saved_map_path, level);
+            }
+            else
+            {
+                /* updating game */
+                updateSavedGame(savedGames, game, level);
+            }
+            
+            
+            free(saved_map_name);
+        }
+        
+        
+    }
+    
+}
+
 /**
  * @brief  prints the map to the terminal
  * @note   From UCP Assignment 1, but has been edited
@@ -38,6 +241,7 @@ void printMap( char ** map, int mapRow, int mapCol )
         printLine( line, mapCol + 2); /* mapCol + 2 so that there is space on either side of the map*/   
     }
     printBorder(mapCol+2);
+    printExitCommandInfo(mapCol+2);
     free(line);
 }
 
