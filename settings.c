@@ -31,7 +31,15 @@ Game* createGame(char* name, char* mapFile, int level, struct tm * lastPlayed)
 /* Function to add a game to a list*/
 void addToSavedGamesList(SavedGames* savedGames, Game* game)
 {
-    savedGames->games[savedGames->size++] = game;
+    if (savedGames->size < 9)
+    {
+        savedGames->games[savedGames->size++] = game;
+    }
+    else
+    {
+        perror("Could not add game to saved games list");
+    }
+    
 }
 
 /* Function to check if a point is in a list*/
@@ -40,7 +48,7 @@ int isInSavedGames(SavedGames* savedGames, char* name)
     int index = -1;
     int i = 0;
     for (i = 0; i < savedGames->size; i++) {
-        if (strcmp(savedGames->games[i]->name, name)) {
+        if (strcmp(savedGames->games[i]->name, name) == 0) {
             index = i;
         }
     }
@@ -76,7 +84,7 @@ void displaySavedGames(SavedGames savedGames)
     /* display saved games name and last played */
 
     printTitle( MIN_LENGTH );
-
+    printExitCommandInfo(MIN_LENGTH);
     printLine( "Saved Games:", MIN_LENGTH );
 
     printDivider(MIN_LENGTH);
@@ -97,7 +105,6 @@ void displaySavedGames(SavedGames savedGames)
     }
     
     printBorder(MIN_LENGTH);
-    /* file layout is the number of saved games\n then each line is the name, last played, mapfile, and level*/
 
 }
 

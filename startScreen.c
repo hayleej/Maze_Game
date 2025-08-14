@@ -29,9 +29,22 @@ void printTitle( int length )
     printf("\033[1m");
     printLine("Maze Game!", length);
     printf("\033[0m");
-
-    /* print bottom border */
     printBorder(length);
+}
+
+/**
+ * @brief  prints the "Select 0 at any time to exit" line with border
+ * @param  length: the number of characters per line
+ * @retval None
+ */
+void printExitCommandInfo( int length )
+{
+    if (length < MIN_LENGTH)
+    {
+        length = MIN_LENGTH;
+    }
+    /* print bottom border */
+    /*printBorder(length);*/
 
     printf("\033[3m");
     printLine("Select 0 at any time to exit the game", length);
