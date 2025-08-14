@@ -17,7 +17,7 @@
  */
 void printTitle( int length )
 {
-
+    system( "clear" );
     if (length < MIN_LENGTH)
     {
         length = MIN_LENGTH;

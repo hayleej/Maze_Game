@@ -49,12 +49,15 @@ int isInSavedGames(SavedGames* savedGames, char* name)
 
 Game * removeGameFromSavedGames(SavedGames * savedGames, char * name)
 {
+    Game * game = NULL;
     int index = isInSavedGames(savedGames, name);
     if (index != - 1)
     {
         /* is in savedGames */
+        game = savedGames->games[index];
         savedGames->games[index] = savedGames->games[--savedGames->size];
     }
+    return game;
 }
 
 /**
@@ -93,7 +96,7 @@ void displaySavedGames(SavedGames savedGames)
         strcpy(line, "(x) ");
     }
     
-    
+    printBorder(MIN_LENGTH);
     /* file layout is the number of saved games\n then each line is the name, last played, mapfile, and level*/
 
 }

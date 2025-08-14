@@ -14,13 +14,13 @@
 typedef struct Game {
     char name[25];
     struct tm * last_played;
-    char map_file[100];
+    char map_file[36];
     int level; /* level = -1 when not playing levels */
 } Game;
 
 typedef struct SavedGames {
     /* Array of Game pointers */
-    Game* games[10];
+    Game* games[9];
     /* Current size of the list */
     int size;
 } SavedGames;

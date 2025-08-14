@@ -133,7 +133,7 @@ SavedGames readSavedGames(char * filename)
     char gameName[25];
     time_t now = time(NULL);
     struct tm * lastPlayed = localtime(&now);
-    char map_file[100];
+    char map_file[36];
     int level; /* level = -1 when not playing levels */
     int size;
 
