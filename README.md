@@ -1,4 +1,4 @@
-# Maze_Game
+# Maze Game
 A command line maze game. Get from one end of the maze to the other without the enemy catching you.
 
 ## Installation
@@ -6,19 +6,19 @@ A command line maze game. Get from one end of the maze to the other without the 
 1. Download the game using the command 
 
 ```bash
-$ git clone https://github.com/hayleej/Maze_Game/
+git clone https://github.com/hayleej/Maze_Game/
 ```
 
 2. Move to the project directory
 
 ```bash
-$ cd Maze_Game/
+cd Maze_Game/
 ```
 
 3. Run make command
 
 ```bash
-$ make
+make
 ```
 
 ## How to Play the Game
@@ -26,10 +26,10 @@ $ make
 Run the following command.
 
 ```bash
-$ maze path/to/map.txt
+./maze
 ```
 
-See [Map File](README.md#Map-File) for more information on `map.txt`.
+See [Map Files](README.md#Map-Files) for more information on `maps/`.
 
 ### Commands in Game
 
@@ -51,18 +51,33 @@ The following table outlines the symbols that can be found on the map of the maz
 | ~                      | Enemy. They are trying to catch player. |
 | #--#<br>\| &nbsp; &nbsp;  \|<br>#--# | Border of the maze.                     |
 
-## Map File
 
-`map.txt` is the file containing the the set up of the maze.
+### Levels
 
-You can either use the existing map that comes with the game or create your own.
+The maze game has multiple levels. The map file for each level is stored in `maps/`.
+
+### Saving Game Progress
+
+When you exit the game, you will be asked if you want to save your current game.
+
+A map file of your current position in the game will be saved to `saved/[saved_name].out`.
+
+You can load your saved progress on start up screen by selecting option 2.
+
+Can only have up to 9 games saved at one time.
+
+## Map Files
+
+Map files are the files containing the the set up of the maze.
+
+You can either use the existing maps and play the levels that come with the game or create your own map file.
 
 ### Use Existing Maps
 
-If you want to use the existing map, run the following command.
+If you want to use the existing maps, run the following command then select option 1 (start new game) or option 2 (load saved game).
 
 ```bash
-$ maze map.txt
+./maze
 ```
 
 ### Create Your Own Map
